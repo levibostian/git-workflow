@@ -1,0 +1,24 @@
+name: Deploy software 
+
+# I have found it better to split up making git tags with semantic-release tool and deploying software. 
+# You can combine the two steps by using https://github.com/semantic-release/exec to run any script 
+# that you wish while semantic-release is running. However, if semantic-release has an error 
+# such as not having permissions to push a git tag to your GitHub repository, you may end up 
+# in a scenario where the git tag is not made but your code got pushed to production. Re-running 
+# the failed action may fix the issue but in some scenarios it is not allowed unless you bump the 
+# semantic version of your software you just pushed. So, to avoid this, make semantic-release 
+# prepare for a deployment by editing your version files and other metadata that you may need for a deployment 
+# and then make a git tag. If there is a failure, you can simply re-run the action to try to make the git tag again. 
+# Then, after git tag make a deployment of the software. If that fails, try it again manually or on the CI server.
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy:
+    name: Deploy 
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      # Run npm, gradle, bash scripts, kubernetes, etc. 
+      # A git tag has been made which means the software is packaged and ready to deploy. 

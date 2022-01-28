@@ -1,0 +1,29 @@
+name: Deploy after branch push 
+on:
+  push:
+    branches: [main, beta, alpha]
+
+jobs:
+  deploy:
+    name: Deploy a git tag 
+    runs-on: ubuntu-latest
+    steps:
+      - name: semantic-release setup
+        uses: levibostian/action-semantic-release-justwork@v1
+      - name: Deploy via semantic release 
+        uses: cycjimmy/semantic-release-action@v2
+        with: 
+          # version numbers below can be in many forms: M, M.m, M.m.p
+          semantic_version: 18
+          extra_plugins: |
+            @semantic-release/git@10
+            @semantic-release/changelog@6
+        env:
+          GITHUB_TOKEN: ${{ secrets.BOT_GH_TOKEN }}
+          
+      - name: Copy commits into develop after main deployment 
+        uses: levibostian/action-sync-branches@v1
+        with:
+          behind: develop
+          ahead: main 
+          githubToken: ${{ secrets.BOT_GH_TOKEN }}
